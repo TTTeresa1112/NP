@@ -51,22 +51,37 @@ const mockReferences = ['B1 Antibiotic resistance is a global threat, driven b..
 
 export default function XmlToPdf() {
   const [isUploaded, setIsUploaded] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [fileName, setFileName] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const processUpload = (file: File) => {
+    setIsUploading(true);
+    setUploadError('');
+    setTimeout(() => {
+      // Mock random success/failure
+      if (Math.random() > 0.5) {
+        setFileName(file.name);
+        setIsUploaded(true);
+      } else {
+        setUploadError('Failed to parse the uploaded file. Please ensure it is a valid XML or ZIP archive.');
+      }
+      setIsUploading(false);
+    }, 1000);
+  };
+
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      setFileName(e.target.files[0].name);
-      setIsUploaded(true);
+      processUpload(e.target.files[0]);
     }
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      setFileName(e.dataTransfer.files[0].name);
-      setIsUploaded(true);
+      processUpload(e.dataTransfer.files[0]);
     }
   };
 
@@ -123,7 +138,7 @@ export default function XmlToPdf() {
         type="file" 
         ref={fileInputRef} 
         onChange={handleFileUpload} 
-        accept=".xml" 
+        accept=".xml,.zip" 
         className="hidden" 
       />
 
@@ -133,19 +148,31 @@ export default function XmlToPdf() {
             <div 
               onDragOver={(e) => e.preventDefault()}
               onDrop={handleDrop}
-              onClick={() => fileInputRef.current?.click()}
-              className="w-full border-2 border-dashed border-zinc-200/80 hover:border-zinc-400 bg-zinc-50/30 hover:bg-zinc-50/80 transition-all rounded-xl p-12 flex flex-col items-center justify-center cursor-pointer group"
+              onClick={() => !isUploading && fileInputRef.current?.click()}
+              className={`w-full border-2 border-dashed border-zinc-200/80 hover:border-zinc-400 bg-zinc-50/30 hover:bg-zinc-50/80 transition-all rounded-xl p-12 flex flex-col items-center justify-center ${isUploading ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer group'}`}
             >
               <div className="w-16 h-16 bg-white border border-zinc-200/80 rounded-2xl shadow-sm flex items-center justify-center mb-6 group-hover:scale-105 transition-transform">
-                <FileCode className="w-8 h-8 text-zinc-600 group-hover:text-zinc-900 transition-colors" strokeWidth={1.5} />
+                {isUploading ? (
+                  <Loader2 className="w-8 h-8 text-zinc-600 animate-spin" strokeWidth={1.5} />
+                ) : (
+                  <FileCode className="w-8 h-8 text-zinc-600 group-hover:text-zinc-900 transition-colors" strokeWidth={1.5} />
+                )}
               </div>
-              <h3 className="text-base font-medium text-zinc-900 tracking-tight mb-2">Upload XML Manuscript</h3>
+              <h3 className="text-base font-medium text-zinc-900 tracking-tight mb-2">
+                {isUploading ? 'Uploading...' : 'Upload XML Manuscript'}
+              </h3>
               <p className="text-[13px] text-zinc-700 font-normal text-center max-w-sm mb-8">
                 Drag and drop your .zip file (including XML and figure (optional) files) here, or click to browse your computer.
               </p>
-              <button className="px-5 py-2.5 bg-white border border-zinc-200/80 text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900 rounded-lg shadow-sm transition-all font-medium text-xs tracking-tight">
-                Select File
+              <button 
+                disabled={isUploading}
+                className="px-5 py-2.5 bg-white border border-zinc-200/80 text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900 rounded-lg shadow-sm transition-all font-medium text-xs tracking-tight disabled:opacity-70 disabled:cursor-not-allowed"
+              >
+                {isUploading ? 'Processing...' : 'Select File'}
               </button>
+              {uploadError && (
+                <p className="text-red-500 text-xs mt-4 font-medium">{uploadError}</p>
+              )}
             </div>
           </div>
         </div>

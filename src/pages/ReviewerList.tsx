@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Search, Plus, ChevronDown, ChevronRight, Info, FileArchive, Upload, Users, Loader2, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -101,6 +101,10 @@ export default function ReviewerList() {
   const [manuscriptId, setManuscriptId] = useState('');
   const [hasFetched, setHasFetched] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
+  const [selectedZip, setSelectedZip] = useState<File | null>(null);
+  const [isGeneratingFile, setIsGeneratingFile] = useState(false);
+  const [generateError, setGenerateError] = useState('');
+  const zipInputRef = useRef<HTMLInputElement>(null);
 
   const handleFetch = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -112,6 +116,28 @@ export default function ReviewerList() {
       setIsFetching(false);
       setHasFetched(true);
     }, 800);
+  };
+
+  const handleZipSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setSelectedZip(e.target.files[0]);
+      setGenerateError('');
+    }
+  };
+
+  const handleGenerateFile = () => {
+    if (!selectedZip) return;
+    setIsGeneratingFile(true);
+    setGenerateError('');
+    setTimeout(() => {
+      if (Math.random() > 0.5) {
+        // Success -> refresh page
+        window.location.reload();
+      } else {
+        setGenerateError('Failed to generate file. The ZIP archive might be corrupted or missing required data.');
+        setIsGeneratingFile(false);
+      }
+    }, 1000);
   };
 
   return (
@@ -270,18 +296,41 @@ export default function ReviewerList() {
             <div className="p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
-                  <button className="flex items-center px-3 py-1.5 bg-white border border-zinc-200/80 hover:bg-zinc-50 text-zinc-700 rounded-lg shadow-sm transition-all font-medium text-[11px] tracking-tight">
+                  <input 
+                    type="file" 
+                    ref={zipInputRef} 
+                    onChange={handleZipSelect} 
+                    accept=".zip" 
+                    className="hidden" 
+                  />
+                  <button 
+                    onClick={() => zipInputRef.current?.click()}
+                    className="flex items-center px-3 py-1.5 bg-white border border-zinc-200/80 hover:bg-zinc-50 text-zinc-700 rounded-lg shadow-sm transition-all font-medium text-[11px] tracking-tight"
+                  >
                     <Upload className="w-3.5 h-3.5 mr-1.5" strokeWidth={1.5} />
-                    Select File <span className="text-zinc-600 ml-2 font-normal">No file selected</span>
+                    Select File <span className="text-zinc-600 ml-2 font-normal truncate max-w-[200px]">{selectedZip ? selectedZip.name : 'No file selected'}</span>
                   </button>
                   <div className="ml-3 text-zinc-600 hover:text-zinc-600 cursor-help transition-colors" title="Select a ZIP file for processing">
                     <Info className="w-4 h-4" strokeWidth={1.5} />
                   </div>
                 </div>
-                <button className="flex items-center px-5 py-2 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg shadow-[0_2px_8px_0_rgb(0,0,0,0.1)] transition-all font-medium text-xs tracking-tight">
-                  <FileArchive className="w-3.5 h-3.5 mr-1.5" strokeWidth={1.5} />
-                  Generate File
-                </button>
+                <div className="flex flex-col items-end">
+                  <button 
+                    onClick={handleGenerateFile}
+                    disabled={!selectedZip || isGeneratingFile}
+                    className="flex items-center px-5 py-2 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg shadow-[0_2px_8px_0_rgb(0,0,0,0.1)] transition-all font-medium text-xs tracking-tight disabled:opacity-70 disabled:cursor-not-allowed"
+                  >
+                    {isGeneratingFile ? (
+                      <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" strokeWidth={1.5} />
+                    ) : (
+                      <FileArchive className="w-3.5 h-3.5 mr-1.5" strokeWidth={1.5} />
+                    )}
+                    {isGeneratingFile ? 'Generating...' : 'Generate File'}
+                  </button>
+                  {generateError && (
+                    <p className="text-red-500 text-xs mt-2 font-medium">{generateError}</p>
+                  )}
+                </div>
               </div>
             </div>
           </div>
