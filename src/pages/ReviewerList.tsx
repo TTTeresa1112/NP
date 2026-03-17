@@ -1,9 +1,22 @@
 import React, { useState } from 'react';
-import { Search, Plus, ChevronDown, ChevronRight, Info, FileArchive, Upload, Users, Loader2 } from 'lucide-react';
+import { Search, Plus, ChevronDown, ChevronRight, Info, FileArchive, Upload, Users, Loader2, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
-const Section = ({ title, hasInfo = false, defaultOpen = true, children }: any) => {
+const Section = ({ title, hasInfo = false, defaultOpen = true, initialData = [] }: any) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
+  const [dataList, setDataList] = useState(
+    initialData.map((item: any) => ({ ...item, id: item.id || Math.random().toString(36).substr(2, 9) }))
+  );
+
+  const handleAdd = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDataList([...dataList, { id: Math.random().toString(36).substr(2, 9), firstName: '', middleName: '', lastName: '', email: '' }]);
+    setIsOpen(true);
+  };
+
+  const handleDelete = (id: string) => {
+    setDataList(dataList.filter((item: any) => item.id !== id));
+  };
 
   return (
     <div className="border-b border-zinc-200/60 last:border-0">
@@ -24,7 +37,7 @@ const Section = ({ title, hasInfo = false, defaultOpen = true, children }: any) 
         </div>
         <button 
           className="flex items-center px-2.5 py-1 text-[11px] font-medium text-zinc-600 bg-white border border-zinc-200/80 hover:bg-zinc-50 rounded-md transition-colors shadow-sm tracking-tight"
-          onClick={(e) => { e.stopPropagation(); /* Add action */ }}
+          onClick={handleAdd}
         >
           <Plus className="w-3 h-3 mr-1" strokeWidth={1.5} />
           Add
@@ -39,7 +52,13 @@ const Section = ({ title, hasInfo = false, defaultOpen = true, children }: any) 
             className="overflow-hidden"
           >
             <div className="pb-5 pt-1 pl-6">
-              {children}
+              {dataList.length > 0 ? (
+                dataList.map((data: any) => (
+                  <PersonRow key={data.id} data={data} onDelete={() => handleDelete(data.id)} />
+                ))
+              ) : (
+                <div className="py-3 text-zinc-600 text-[11px] font-normal italic">No data, click Add to create</div>
+              )}
             </div>
           </motion.div>
         )}
@@ -48,8 +67,8 @@ const Section = ({ title, hasInfo = false, defaultOpen = true, children }: any) 
   );
 };
 
-const PersonRow = ({ data }: any) => (
-  <div className="flex items-center mb-3 last:mb-0 group">
+const PersonRow = ({ data, onDelete }: any) => (
+  <div className="flex items-end mb-3 last:mb-0 group">
     <div className="grid grid-cols-4 gap-4 flex-1">
       <div>
         <label className="block text-[11px] font-medium text-zinc-600 uppercase tracking-widest mb-1.5">First Name</label>
@@ -68,6 +87,13 @@ const PersonRow = ({ data }: any) => (
         <input type="email" defaultValue={data.email} className="w-full px-2.5 py-1.5 bg-white border border-zinc-200/80 rounded-md text-xs focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 transition-all text-zinc-800 shadow-sm font-normal" />
       </div>
     </div>
+    <button 
+      onClick={onDelete}
+      className="ml-4 p-1.5 mb-0.5 text-zinc-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+      title="Delete"
+    >
+      <Trash2 className="w-4 h-4" strokeWidth={1.5} />
+    </button>
   </div>
 );
 
@@ -173,26 +199,32 @@ export default function ReviewerList() {
               <h3 className="text-[13px] font-medium text-zinc-900 tracking-tight">Personnel Modules</h3>
             </div>
             <div className="px-6">
-              <Section title="Author(s)">
-                <PersonRow data={{ firstName: 'John', middleName: '', lastName: 'Doe', email: 'john.doe@example.com' }} />
-                <PersonRow data={{ firstName: 'Jane', middleName: 'A.', lastName: 'Smith', email: 'jane.smith@example.com' }} />
-              </Section>
+              <Section 
+                title="Author(s)" 
+                initialData={[
+                  { firstName: 'John', middleName: '', lastName: 'Doe', email: 'john.doe@example.com' },
+                  { firstName: 'Jane', middleName: 'A.', lastName: 'Smith', email: 'jane.smith@example.com' }
+                ]} 
+              />
 
-              <Section title="Editor in Chief">
-                <PersonRow data={{ firstName: 'Robert', middleName: '', lastName: 'Brown', email: 'editor@journal.com' }} />
-              </Section>
+              <Section 
+                title="Editor in Chief" 
+                initialData={[
+                  { firstName: 'Robert', middleName: '', lastName: 'Brown', email: 'editor@journal.com' }
+                ]} 
+              />
 
-              <Section title="Academic Editor(s)" defaultOpen={false}>
-                <div className="py-3 text-zinc-600 text-[11px] font-normal italic">No data, click Add to create</div>
-              </Section>
+              <Section title="Academic Editor(s)" defaultOpen={false} initialData={[]} />
 
-              <Section title="ARES Reviewer(s)" hasInfo={true}>
-                <PersonRow data={{ firstName: 'Michael', middleName: '', lastName: 'Johnson', email: 'mj@university.edu' }} />
-              </Section>
+              <Section 
+                title="ARES Reviewer(s)" 
+                hasInfo={true} 
+                initialData={[
+                  { firstName: 'Michael', middleName: '', lastName: 'Johnson', email: 'mj@university.edu' }
+                ]} 
+              />
 
-              <Section title="Authors' Recommended Reviewer(s)" defaultOpen={false}>
-                <div className="py-3 text-zinc-600 text-[11px] font-normal italic">No data, click Add to create</div>
-              </Section>
+              <Section title="Authors' Recommended Reviewer(s)" defaultOpen={false} initialData={[]} />
             </div>
           </div>
 
