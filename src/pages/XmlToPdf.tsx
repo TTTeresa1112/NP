@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Upload, FileText, Settings2, ChevronDown, ChevronRight, Image as ImageIcon, AlignLeft, BookOpen, LayoutTemplate, FileCode, Loader2 } from 'lucide-react';
+import { Upload, FileText, Settings2, ChevronDown, ChevronRight, Image as ImageIcon, AlignLeft, BookOpen, LayoutTemplate, FileCode, Loader2, Download } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 const ConfigSection = ({ title, icon: Icon, defaultOpen = false, children }: any) => {
@@ -55,14 +55,16 @@ export default function XmlToPdf() {
   const [uploadError, setUploadError] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [fileName, setFileName] = useState('');
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const processUpload = (file: File) => {
     setIsUploading(true);
     setUploadError('');
+    setPdfUrl(null);
     setTimeout(() => {
       // Mock random success/failure
-      if (Math.random() > 0.5) {
+      if (Math.random() > 0.2) { // Increase success rate
         setFileName(file.name);
         setIsUploaded(true);
       } else {
@@ -87,14 +89,22 @@ export default function XmlToPdf() {
 
   const handleGeneratePdf = () => {
     setIsGenerating(true);
+    setPdfUrl(null);
     setTimeout(() => {
       setIsGenerating(false);
       // Create a dummy PDF blob to open in a new tab
       const pdfContent = '%PDF-1.4\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>\nendobj\n4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n5 0 obj\n<< /Length 44 >>\nstream\nBT\n/F1 24 Tf\n100 700 Td\n(Generated PDF Document) Tj\nET\nendstream\nendobj\nxref\n0 6\n0000000000 65535 f \n0000000009 00000 n \n0000000058 00000 n \n0000000115 00000 n \n0000000224 00000 n \n0000000312 00000 n \ntrailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n417\n%%EOF';
       const blob = new Blob([pdfContent], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
+      setPdfUrl(url);
       window.open(url, '_blank');
     }, 1500);
+  };
+
+  const handleDownloadPdf = () => {
+    if (pdfUrl) {
+      window.open(pdfUrl, '_blank');
+    }
   };
 
   return (
@@ -110,6 +120,15 @@ export default function XmlToPdf() {
         <div className="flex items-center space-x-2">
           {isUploaded && (
             <>
+              {pdfUrl && (
+                <button 
+                  onClick={handleDownloadPdf}
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-[0_2px_8px_0_rgb(0,0,0,0.1)] transition-all font-medium text-xs flex items-center tracking-tight mr-2"
+                >
+                  <Download className="w-3.5 h-3.5 mr-1.5" strokeWidth={1.5} />
+                  Download PDF
+                </button>
+              )}
               <button 
                 onClick={() => fileInputRef.current?.click()}
                 className="px-4 py-2 bg-white border border-zinc-200/80 text-zinc-700 hover:bg-zinc-50 rounded-lg shadow-sm transition-all font-medium text-xs flex items-center tracking-tight"

@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Upload, FileCode, ChevronDown, FileText, Loader2, CheckCircle2 } from 'lucide-react';
+import { Upload, FileCode, ChevronDown, FileText, Loader2, CheckCircle2, Download } from 'lucide-react';
 import { motion } from 'motion/react';
 
 export default function WordToXml() {
@@ -9,6 +9,7 @@ export default function WordToXml() {
   const [selectedJournal, setSelectedJournal] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [xmlUrl, setXmlUrl] = useState<string | null>(null);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -18,6 +19,7 @@ export default function WordToXml() {
       setIsUploaded(true);
       setErrorMessage(null);
       setSuccessMsg(null);
+      setXmlUrl(null);
     }
   };
 
@@ -28,6 +30,7 @@ export default function WordToXml() {
       setIsUploaded(true);
       setErrorMessage(null);
       setSuccessMsg(null);
+      setXmlUrl(null);
     }
   };
 
@@ -40,20 +43,35 @@ export default function WordToXml() {
     setIsGenerating(true);
     setErrorMessage(null);
     setSuccessMsg(null);
+    setXmlUrl(null);
 
     // Mock generation process
     setTimeout(() => {
       setIsGenerating(false);
       
       // Randomly simulate success or error for demonstration
-      const isSuccess = Math.random() > 0.5;
+      const isSuccess = Math.random() > 0.2; // Increase success rate for better UX
       
       if (isSuccess) {
         setSuccessMsg('XML Generated successfully! The file is ready for download or preview.');
+        const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>\n<article>\n  <title>Converted Document</title>\n  <content>This is a mock XML generated from ${fileName}</content>\n</article>`;
+        const blob = new Blob([xmlContent], { type: 'text/xml' });
+        setXmlUrl(URL.createObjectURL(blob));
       } else {
         setErrorMessage('Date format error. Please check the document and try again.');
       }
     }, 1500);
+  };
+
+  const handleDownloadXml = () => {
+    if (xmlUrl) {
+      const a = document.createElement('a');
+      a.href = xmlUrl;
+      a.download = `${fileName.replace(/\.[^/.]+$/, "") || 'document'}.xml`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
   };
 
   return (
@@ -67,6 +85,15 @@ export default function WordToXml() {
           </p>
         </div>
         <div className="flex items-center space-x-2">
+          {xmlUrl && (
+            <button 
+              onClick={handleDownloadXml}
+              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-[0_2px_8px_0_rgb(0,0,0,0.1)] transition-all font-medium text-xs flex items-center tracking-tight mr-2"
+            >
+              <Download className="w-3.5 h-3.5 mr-1.5" strokeWidth={1.5} />
+              Download XML
+            </button>
+          )}
           <button 
             onClick={handleGenerateXml}
             disabled={!isUploaded || !selectedJournal || isGenerating}
