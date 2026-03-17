@@ -42,12 +42,14 @@ export default function Header({ currentPage, setCurrentPage, username, onLogout
       <div className="flex items-center space-x-6">
         
         {/* Desk Button */}
-        <button
-          onClick={() => setCurrentPage('desk-test')}
+        <a
+          href="http://paidui.wanleibio.cn/center/index"
+          target="_blank"
+          rel="noopener noreferrer"
           className="px-3.5 py-2 bg-white border border-zinc-200/80 hover:border-zinc-300 hover:bg-zinc-50 text-zinc-700 rounded-lg transition-all font-medium text-sm flex items-center shadow-sm"
         >
           Desk
-        </button>
+        </a>
 
         <div className="w-px h-6 bg-zinc-200/80"></div>
 

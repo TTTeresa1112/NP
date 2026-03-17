@@ -13,7 +13,6 @@ import ReviewerList from './pages/ReviewerList';
 import WordToXml from './pages/WordToXml';
 import XmlToPdf from './pages/XmlToPdf';
 import XmlPreview from './pages/XmlPreview';
-import DeskTest from './pages/DeskTest';
 import Login from './pages/Login';
 
 export default function App() {
@@ -52,7 +51,6 @@ export default function App() {
       case 'word-to-xml': return <WordToXml />;
       case 'xml-to-pdf': return <XmlToPdf />;
       case 'xml-preview': return <XmlPreview />;
-      case 'desk-test': return <DeskTest />;
       default: return <Home setCurrentPage={setCurrentPage} />;
     }
   };
