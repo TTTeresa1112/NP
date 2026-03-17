@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Save, ExternalLink, RefreshCw, Search, Italic, Superscript, Subscript, ChevronLeft } from 'lucide-react';
+import { Save, ExternalLink, RefreshCw, Search, Italic, Superscript, Subscript, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion } from 'motion/react';
 
 const mockEditorData = [
@@ -141,6 +141,17 @@ const RichTextEditor = ({ initialValue, onChange }: { initialValue: string, onCh
 
 export default function Editor({ onBack, onComplete }: any) {
   const [editorData, setEditorData] = React.useState(mockEditorData);
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const [pageSize, setPageSize] = React.useState(100);
+
+  const totalPages = Math.ceil(editorData.length / pageSize) || 1;
+  const paginatedData = editorData.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
 
   const handleContentChange = (id: number, newContent: string) => {
     setEditorData(prev => prev.map(item => item.id === id ? { ...item, converted: newContent } : item));
@@ -150,7 +161,7 @@ export default function Editor({ onBack, onComplete }: any) {
     <motion.div 
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="h-full flex flex-col max-w-[1200px] mx-auto pb-20"
+      className="min-h-full flex flex-col max-w-[1200px] mx-auto pb-20"
     >
       {/* Top Actions */}
       <div className="flex justify-between items-center pb-4 border-b border-zinc-200/60 mb-2">
@@ -182,8 +193,9 @@ export default function Editor({ onBack, onComplete }: any) {
 
       {/* Editor List */}
       <div className="bg-white rounded-2xl border border-zinc-200/60 shadow-sm overflow-hidden flex flex-col">
-        {editorData.map((row, index) => (
-          <div key={row.id} className={`py-6 hover:bg-zinc-50 transition-colors duration-300 px-6 ${index !== editorData.length - 1 ? 'border-b border-zinc-200/60' : ''}`}>
+        <div>
+          {paginatedData.map((row, index) => (
+            <div key={row.id} className={`py-6 hover:bg-zinc-50 transition-colors duration-300 px-6 ${index !== paginatedData.length - 1 ? 'border-b border-zinc-200/60' : ''}`}>
             
             {/* Row 1: Header & Metadata */}
             <div className="flex items-center justify-between mb-4">
@@ -304,6 +316,50 @@ export default function Editor({ onBack, onComplete }: any) {
 
           </div>
         ))}
+        </div>
+        
+        {/* Pagination */}
+        <div className="px-6 py-4 border-t border-zinc-100 flex items-center justify-between bg-zinc-50/30">
+          <span className="text-[11px] text-zinc-600 font-medium tracking-widest uppercase">
+            Page {currentPage} of {totalPages}
+          </span>
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <span className="text-[11px] text-zinc-600 font-medium tracking-widest uppercase">Page size:</span>
+              <select 
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+                className="bg-white border border-zinc-200/80 rounded-md text-xs py-1 px-2 focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 text-zinc-700 shadow-sm font-normal"
+              >
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+              </select>
+            </div>
+            <div className="flex items-center space-x-1">
+              <button 
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="p-1.5 rounded-md border border-zinc-200/80 text-zinc-600 hover:text-zinc-600 hover:bg-white disabled:opacity-50 transition-colors bg-white shadow-sm"
+              >
+                <ChevronLeft className="w-3.5 h-3.5" strokeWidth={1.5} />
+              </button>
+              <button className="w-7 h-7 rounded-md bg-zinc-900 text-white text-[11px] font-medium flex items-center justify-center shadow-sm">
+                {currentPage}
+              </button>
+              <button 
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="p-1.5 rounded-md border border-zinc-200/80 text-zinc-600 hover:text-zinc-600 hover:bg-white disabled:opacity-50 transition-colors bg-white shadow-sm"
+              >
+                <ChevronRight className="w-3.5 h-3.5" strokeWidth={1.5} />
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </motion.div>
   );
