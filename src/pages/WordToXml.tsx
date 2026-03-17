@@ -105,8 +105,20 @@ export default function WordToXml() {
                 className="w-full appearance-none bg-zinc-50 border border-zinc-200/80 rounded-lg px-4 py-2.5 text-[13px] focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 text-zinc-800 shadow-sm font-normal transition-all"
               >
                 <option value="">Select a journal...</option>
-                <option value="1">Exploration of Asthma & Allergy</option>
-                <option value="2">Journal of Advanced Research</option>
+                <option value="1">Exploration of Medicine</option>
+                <option value="2">Exploration of Targeted Anti-tumor Therapy</option>
+                <option value="3">Exploration of Immunology</option>
+                <option value="4">Exploration of Neuroprotective Therapy</option>
+                <option value="5">Exploration of Digestive Diseases</option>
+                <option value="6">Exploration of Neuroscience</option>
+                <option value="7">Exploration of Musculoskeletal Diseases</option>
+                <option value="8">Exploration of Drug Science</option>
+                <option value="9">Exploration of Asthma & Allergy</option>
+                <option value="10">Exploration of Foods and Foodomics</option>
+                <option value="11">Exploration of Digital Health Technologies</option>
+                <option value="12">Exploration of Cardiology</option>
+                <option value="13">Exploration of BioMat-X</option>
+                <option value="14">Exploration of Endocrine and Metabolic Diseases</option>
               </select>
               <ChevronDown className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-zinc-600 pointer-events-none" strokeWidth={1.5} />
             </div>
