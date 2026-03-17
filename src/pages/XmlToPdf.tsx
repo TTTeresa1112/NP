@@ -35,9 +35,9 @@ const ConfigSection = ({ title, icon: Icon, defaultOpen = false, children }: any
 };
 
 const mockFigures = [
-  { id: 'fig1', width: '300', drawAtPage: '3', rotation: '', following: false, largeTable: false, cellFontSize: '', colWidth: '' },
-  { id: 'fig2', width: '360', drawAtPage: '', rotation: '', following: true, largeTable: false, cellFontSize: '', colWidth: '' },
-  { id: 't1', width: 'PDF Page Width: 481.5', drawAtPage: '', rotation: '', following: true, largeTable: false, cellFontSize: '', colWidth: '' },
+  { id: 'fig1', type: 'image', width: '', drawAtPage: '', rotation: '', following: true, largeTable: false, cellFontSize: '', colWidth: '' },
+  { id: 'fig2', type: 'image', width: '', drawAtPage: '', rotation: '', following: true, largeTable: false, cellFontSize: '', colWidth: '' },
+  { id: 't1', type: 'table', width: '', drawAtPage: '', rotation: '', following: true, largeTable: false, cellFontSize: '', colWidth: '' },
 ];
 
 const mockParagraphs = [
@@ -47,7 +47,7 @@ const mockParagraphs = [
   "Despite the escalating clinical need, the antibiot..."
 ];
 
-const mockReferences = ['B1', 'B2', 'B3', 'B4', 'B5'];
+const mockReferences = ['B1 Antibiotic resistance is a global threat, driven b...', 'B2 The rapid emergence and global dissemination of an...', 'B3 Global surveillance initiatives, including the WHO...', 'B4 Despite the escalating clinical need, the antibiot...', 'B5 Antibiotic resistance is a global threat, driven b...'];
 
 export default function XmlToPdf() {
   const [isUploaded, setIsUploaded] = useState(false);
@@ -141,7 +141,7 @@ export default function XmlToPdf() {
               </div>
               <h3 className="text-base font-medium text-zinc-900 tracking-tight mb-2">Upload XML Manuscript</h3>
               <p className="text-[13px] text-zinc-700 font-normal text-center max-w-sm mb-8">
-                Drag and drop your XML file here, or click to browse your computer.
+                Drag and drop your .zip file (including XML and figure (optional) files) here, or click to browse your computer.
               </p>
               <button className="px-5 py-2.5 bg-white border border-zinc-200/80 text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900 rounded-lg shadow-sm transition-all font-medium text-xs tracking-tight">
                 Select File
@@ -158,7 +158,7 @@ export default function XmlToPdf() {
         
         {/* Style Config */}
         <ConfigSection title="Style Config" icon={LayoutTemplate} defaultOpen={true}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-6">
             <div>
               <label className="block text-[11px] font-medium text-zinc-600 uppercase tracking-widest mb-1.5">Title Space Font Size</label>
               <input type="text" className="w-full px-2.5 py-1.5 bg-white border border-zinc-200/80 rounded-md text-xs focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 transition-all text-zinc-800 shadow-sm font-normal" />
@@ -166,16 +166,16 @@ export default function XmlToPdf() {
             </div>
             <div>
               <label className="block text-[11px] font-medium text-zinc-600 uppercase tracking-widest mb-1.5">Title Character Spacing</label>
-              <input type="text" defaultValue=">=0" className="w-full px-2.5 py-1.5 bg-white border border-zinc-200/80 rounded-md text-xs focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 transition-all text-zinc-800 shadow-sm font-normal" />
+              <input type="text" className="w-full px-2.5 py-1.5 bg-white border border-zinc-200/80 rounded-md text-xs focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 transition-all text-zinc-800 shadow-sm font-normal" />
             </div>
             <div>
               <label className="block text-[11px] font-medium text-zinc-600 uppercase tracking-widest mb-1.5">Author(s) Space Font Size</label>
               <input type="text" className="w-full px-2.5 py-1.5 bg-white border border-zinc-200/80 rounded-md text-xs focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 transition-all text-zinc-800 shadow-sm font-normal" />
               <p className="text-[11px] text-zinc-600 mt-1.5 font-normal">Default Author(s) Font Size: 11</p>
             </div>
-            <div className="md:col-span-2">
+            <div className="md:col-span-3">
               <label className="block text-[11px] font-medium text-zinc-600 uppercase tracking-widest mb-1.5">Page Bottom Margin</label>
-              <input type="text" defaultValue="5,45" className="w-full px-2.5 py-1.5 bg-white border border-zinc-200/80 rounded-md text-xs focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 transition-all text-zinc-800 shadow-sm font-normal" />
+              <input type="text" className="w-full px-2.5 py-1.5 bg-white border border-zinc-200/80 rounded-md text-xs focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 transition-all text-zinc-800 shadow-sm font-normal" />
               <div className="text-[11px] text-zinc-600 mt-2 space-y-1 font-normal">
                 <p>Default Page Bottom Margin: 1st page (<span className="font-medium text-zinc-600">110</span>), other pages (<span className="font-medium text-zinc-600">56.69</span>)</p>
                 <p><span className="font-medium text-zinc-600">'1, 116; 5, 62'</span> means page 1's bottom margin is 116, and page 5's bottom margin is 62</p>
@@ -190,10 +190,11 @@ export default function XmlToPdf() {
             {mockFigures.map((item, idx) => (
               <div key={item.id} className={`py-5 ${idx !== mockFigures.length - 1 ? 'border-b border-zinc-200/60' : ''}`}>
                 <h4 className="text-xs font-mono text-zinc-900 mb-4 tracking-tight">{item.id}</h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
+                <div className={`grid grid-cols-1 ${item.type === 'table' ? 'md:grid-cols-4' : 'md:grid-cols-3'} gap-6 mb-4`}>
                   <div>
                     <label className="block text-[11px] font-medium text-zinc-600 uppercase tracking-widest mb-1.5">Width</label>
                     <input type="text" defaultValue={item.width} className="w-full px-2.5 py-1.5 bg-white border border-zinc-200/80 rounded-md text-xs focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 transition-all text-zinc-800 shadow-sm font-normal" />
+                    <p className="text-[11px] text-zinc-500 mt-1.5 font-normal">PDF Page Width: 481.5</p>
                   </div>
                   <div>
                     <label className="block text-[11px] font-medium text-zinc-600 uppercase tracking-widest mb-1.5">Draw at Page</label>
@@ -208,29 +209,34 @@ export default function XmlToPdf() {
                       <option value="270">270°</option>
                     </select>
                   </div>
+                  {item.type === 'table' && (
+                    <div>
+                      <label className="block text-[11px] font-medium text-zinc-600 uppercase tracking-widest mb-1.5">Table Cell Font Size</label>
+                      <input type="text" className="w-full px-2.5 py-1.5 bg-white border border-zinc-200/80 rounded-md text-xs focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 transition-all text-zinc-800 shadow-sm font-normal" />
+                      <p className="text-[11px] text-zinc-500 mt-1.5 font-normal">Default: 8.5</p>
+                    </div>
+                  )}
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
-                  <div className="flex items-center h-full pt-5">
-                    <label className="flex items-center space-x-2 cursor-pointer group">
-                      <input type="checkbox" defaultChecked={item.following} className="w-3.5 h-3.5 text-zinc-900 border-zinc-300 rounded focus:ring-zinc-900" />
-                      <span className="text-[11px] font-medium text-zinc-600 group-hover:text-zinc-900 transition-colors tracking-tight">Following with Content</span>
-                    </label>
+                
+                {item.type === 'table' && (
+                  <div className="mb-4">
+                    <label className="block text-[11px] font-medium text-zinc-600 uppercase tracking-widest mb-1.5">Table Column Width</label>
+                    <input type="text" defaultValue={item.colWidth} className="w-full px-2.5 py-1.5 bg-white border border-zinc-200/80 rounded-md text-xs focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 transition-all text-zinc-800 shadow-sm font-normal" />
+                    <p className="text-[11px] text-zinc-600 mt-1.5 font-normal">Default: 1,100;2,200 (Column 1: minimum width is 100, Column 2: minimum width is 200)</p>
                   </div>
-                  <div className="flex items-center h-full pt-5">
+                )}
+
+                <div className="flex items-center space-x-6">
+                  <label className="flex items-center space-x-2 cursor-pointer group">
+                    <input type="checkbox" defaultChecked={item.following} className="w-3.5 h-3.5 text-zinc-900 border-zinc-300 rounded focus:ring-zinc-900" />
+                    <span className="text-[11px] font-medium text-zinc-600 group-hover:text-zinc-900 transition-colors tracking-tight">Following with Content</span>
+                  </label>
+                  {item.type === 'table' && (
                     <label className="flex items-center space-x-2 cursor-pointer group">
                       <input type="checkbox" defaultChecked={item.largeTable} className="w-3.5 h-3.5 text-zinc-900 border-zinc-300 rounded focus:ring-zinc-900" />
                       <span className="text-[11px] font-medium text-zinc-600 group-hover:text-zinc-900 transition-colors tracking-tight">Large Table</span>
                     </label>
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-medium text-zinc-600 uppercase tracking-widest mb-1.5">Table Cell Font Size</label>
-                    <input type="text" placeholder="Default: 8.5" className="w-full px-2.5 py-1.5 bg-white border border-zinc-200/80 rounded-md text-xs focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 transition-all text-zinc-800 shadow-sm font-normal placeholder:text-zinc-600" />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-[11px] font-medium text-zinc-600 uppercase tracking-widest mb-1.5">Table Column Width</label>
-                  <input type="text" defaultValue={item.colWidth} className="w-full px-2.5 py-1.5 bg-white border border-zinc-200/80 rounded-md text-xs focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 transition-all text-zinc-800 shadow-sm font-normal" />
-                  <p className="text-[11px] text-zinc-600 mt-1.5 font-normal">Default: 1,100;2,200 (Column 1: minimum width is 100, Column 2: minimum width is 200)</p>
+                  )}
                 </div>
               </div>
             ))}
@@ -264,11 +270,11 @@ export default function XmlToPdf() {
         <ConfigSection title="Reference Config" icon={BookOpen}>
           <div className="flex flex-col">
             {mockReferences.map((ref, idx) => (
-              <div key={idx} className={`py-3 flex items-center justify-between gap-4 ${idx !== mockReferences.length - 1 ? 'border-b border-zinc-200/60' : ''}`}>
-                <div className="w-16">
-                  <span className="text-[13px] font-mono font-medium text-zinc-800">{ref}</span>
+              <div key={idx} className={`py-4 flex flex-col md:flex-row md:items-center justify-between gap-4 ${idx !== mockReferences.length - 1 ? 'border-b border-zinc-200/60' : ''}`}>
+                <div className="flex-1">
+                  <p className="text-[13px] font-normal text-zinc-700">{ref}</p>
                 </div>
-                <div className="flex items-center space-x-8 flex-1 justify-end">
+                <div className="flex items-center space-x-6">
                   <div className="flex items-center space-x-3">
                     <label className="text-[11px] font-medium text-zinc-600 uppercase tracking-widest whitespace-nowrap">Min Before Point:</label>
                     <input type="text" className="w-16 px-2.5 py-1 bg-white border border-zinc-200/80 rounded-md text-xs focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 transition-all text-zinc-800 shadow-sm font-normal text-center" />
