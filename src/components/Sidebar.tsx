@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, FileText, FileJson, Settings, Users, BookOpen, FileCode, FileType, FileOutput, Eye } from 'lucide-react';
+import { LayoutDashboard, FileText, FileJson, Settings, Users, BookOpen, FileCode, FileType, FileOutput, Eye, FileUp } from 'lucide-react';
 
 const menuItems = [
   {
@@ -30,6 +30,7 @@ const menuItems = [
     category: 'Data Processing',
     items: [
       { id: 'reviewer-list', label: 'Reviewer List', icon: Users },
+      { id: 'generate-file-url', label: 'Generate File URL', icon: FileUp },
     ]
   }
 ];

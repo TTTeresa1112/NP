@@ -29,6 +29,7 @@ export default function Header({ currentPage, setCurrentPage, username, onLogout
       case 'word-to-xml': return 'WORD to XML';
       case 'xml-to-pdf': return 'XML to PDF';
       case 'xml-preview': return 'XML Preview';
+      case 'generate-file-url': return 'Generate File URL';
       case 'desk-test': return 'Desk Test';
       default: return 'Dashboard';
     }
